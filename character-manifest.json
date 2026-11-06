@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "characters": [
+    {
+      "name": "momo",
+      "stages": [
+        {
+          "stage": "hatchling",
+          "src": "/assets/characters/momo/hatchling.glb",
+          "status": "not-produced"
+        },
+        {
+          "stage": "baby",
+          "src": "/assets/characters/momo/baby.glb",
+          "status": "not-produced"
+        },
+        {
+          "stage": "child",
+          "src": "/assets/characters/momo/child.glb",
+          "status": "not-produced"
+        }
+      ]
+    },
+    {
+      "name": "lulu",
+      "stages": [
+        {
+          "stage": "hatchling",
+          "src": "/assets/characters/lulu/hatchling.glb",
+          "status": "not-produced"
+        },
+        {
+          "stage": "baby",
+          "src": "/assets/characters/lulu/baby.glb",
+          "status": "not-produced"
+        },
+        {
+          "stage": "child",
+          "src": "/assets/characters/lulu/child.glb",
+          "status": "not-produced"
+        }
+      ]
+    },
+    {
+      "name": "pico",
+      "stages": [
+        {
+          "stage": "hatchling",
+          "src": "/assets/characters/pico/hatchling.glb",
+          "status": "not-produced"
+        },
+        {
+          "stage": "baby",
+          "src": "/assets/characters/pico/baby.glb",
+          "status": "not-produced"
+        },
+        {
+          "stage": "child",
+          "src": "/assets/characters/pico/child.glb",
+          "status": "not-produced"
+        }
+      ]
+    }
+  ],
+  "licensePolicy": "commercial-rights-verification-required",
+  "production3DReady": false
+}
