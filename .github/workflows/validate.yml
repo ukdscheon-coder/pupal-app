@@ -1,0 +1,15 @@
+name: Validate PUPAL
+on:
+  push:
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check required files
+        run: |
+          test -s index.html
+          test -s README.md
+          grep -q "PUPAL" index.html
+          grep -q "localStorage" index.html
