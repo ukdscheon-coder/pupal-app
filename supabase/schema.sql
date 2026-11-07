@@ -34,7 +34,7 @@ alter table public.missions enable row level security;
 create policy "family owner can read" on public.families for select to authenticated using (created_by=auth.uid());
 create policy "family owner can create" on public.families for insert to authenticated with check(created_by=auth.uid());
 create policy "family members read" on public.family_members for select to authenticated using(public.is_family_member(family_id));
-create policy "family owner adds members" on public.family_members for insert to authenticated with check(user_id=auth.uid() and public.is_family_parent(family_id));
+create policy "family creator joins as parent" on public.family_members for insert to authenticated with check (user_id=auth.uid() and role='parent' and exists (select 1 from public.families where id=family_id and created_by=auth.uid()));
 create policy "members read missions" on public.missions for select to authenticated using(public.is_family_member(family_id));
 create policy "parents add missions" on public.missions for insert to authenticated with check(public.is_family_parent(family_id) and created_by=auth.uid());
 -- Deliberately no direct UPDATE policy: approve/declare via separately audited RPC functions.
