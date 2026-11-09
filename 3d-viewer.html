@@ -1,1 +1,168 @@
-<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PUPAL 3D Asset Validator</title><style>body{margin:0;background:#f8f4f0;font-family:system-ui;color:#302e3e}main{max-width:700px;margin:auto;padding:18px}canvas{width:100%;height:65vh;display:block;border-radius:24px;background:#e8e1d8}select,button{padding:12px;margin:5px;border-radius:12px;border:1px solid #aaa}#status{padding:14px;background:white;border-radius:15px}</style><main><h1>PUPAL 3D 모델 검증기</h1><p>실제 GLB 파일을 불러와 회전, 애니메이션, 성장 단계를 확인합니다. 모델이 없으면 가짜 캐릭터를 보여주지 않습니다.</p><select id="name"><option value="momo">Momo</option><option value="lulu">Lulu</option><option value="pico">Pico</option></select><select id="stage"><option value="hatchling">탄생</option><option value="baby">영유아기</option><option value="child">아동기</option></select><button id="load">모델 확인</button><input type="file" id="file" accept=".glb,.gltf"><div id="status">모델을 선택하세요.</div><div id="scene"></div></main><script type="module">import * as THREE from 'https://esm.sh/three@0.180.0';import{GLTFLoader}from'https://esm.sh/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';import{OrbitControls}from'https://esm.sh/three@0.180.0/examples/jsm/controls/OrbitControls.js';const scene=new THREE.Scene();scene.background=new THREE.Color('#e8e1d8');const camera=new THREE.PerspectiveCamera(40,1,.01,100);camera.position.set(0,1.4,4);const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setSize(600,450);document.querySelector('#scene').append(renderer.domElement);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;scene.add(new THREE.HemisphereLight(0xffffff,0x77718c,2));const light=new THREE.DirectionalLight(0xffffff,2.3);light.position.set(2,5,4);scene.add(light);let current,mixer;const clock=new THREE.Clock();const loader=new GLTFLoader();function show(g){if(current){scene.remove(current);current.traverse(o=>{if(o.geometry)o.geometry.dispose()})}current=g.scene;scene.add(current);const box=new THREE.Box3().setFromObject(current);const center=box.getCenter(new THREE.Vector3());const size=box.getSize(new THREE.Vector3());current.position.sub(center);current.position.y+=size.y/2;camera.position.set(0,Math.max(.5,size.y*.7),Math.max(2,size.length()*1.4));controls.target.set(0,size.y*.5,0);mixer=g.animations.length?new THREE.AnimationMixer(current):null;if(mixer)mixer.clipAction(g.animations[0]).play();document.querySelector('#status').textContent='실제 GLB 로드 완료. Animation clips: '+g.animations.map(x=>x.name).join(', ')}function err(e){document.querySelector('#status').textContent='모델을 불러오지 못했습니다. 아직 해당 3D 자산이 제작되지 않았거나 파일 형식이 잘못되었습니다.'}document.querySelector('#load').onclick=()=>{const path='/assets/characters/'+document.querySelector('#name').value+'/'+document.querySelector('#stage').value+'.glb';document.querySelector('#status').textContent=path+' 확인 중';loader.load(path,show,undefined,err)};document.querySelector('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);loader.load(url,g=>{show(g);URL.revokeObjectURL(url)},undefined,e=>{err(e);URL.revokeObjectURL(url)})};function animate(){requestAnimationFrame(animate);const dt=clock.getDelta();if(mixer)mixer.update(dt);controls.update();const w=document.querySelector('#scene').clientWidth;const h=Math.max(300,Math.min(600,window.innerHeight*.6));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.render(scene,camera)}animate()</script>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PuPal 3D Emotion Viewer</title>
+<style>
+body{margin:0;background:#f8f4f0;font-family:system-ui;color:#302e3e}
+main{max-width:800px;margin:auto;padding:18px}
+canvas{width:100%;height:60vh;display:block;border-radius:24px;background:#e8e1d8}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+select,button,input{padding:10px 14px;border-radius:12px;border:1px solid #aaa;font-size:14px}
+button{background:#4ecdc4;color:white;border:none;cursor:pointer}
+button:hover{background:#3db8b0}
+#status{padding:14px;background:white;border-radius:15px;margin-top:10px;font-size:14px}
+.emotion-btn{background:#a0c4ff}
+.emotion-btn.active{background:#ff6b6b}
+</style>
+</head>
+<body>
+<main>
+<h1>PuPal 3D 정서 반응 뷰어</h1>
+<p>캐릭터당 <strong>1개의 GLB</strong> 안에 여러 정서 클립을 넣는 가장 효율적인 구조입니다.</p>
+
+<div class="controls">
+  <select id="character">
+    <option value="pip">Pip (예시)</option>
+    <option value="lila">Lila (예시)</option>
+  </select>
+  <input type="file" id="file" accept=".glb,.gltf">
+  <button id="load">모델 로드</button>
+</div>
+
+<div class="controls" id="emotions"></div>
+<div id="status">GLB 파일을 로드하세요. (하나의 파일에 idle / happy / regret / encourage 등 여러 클립이 들어있어야 합니다)</div>
+<div id="scene"></div>
+</main>
+
+<script type="module">
+import * as THREE from 'https://esm.sh/three@0.180.0';
+import { GLTFLoader } from 'https://esm.sh/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'https://esm.sh/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#e8e1d8');
+const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 100);
+camera.position.set(0, 1.4, 4);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.querySelector('#scene').append(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x77718c, 2));
+const light = new THREE.DirectionalLight(0xffffff, 2.3);
+light.position.set(2, 5, 4);
+scene.add(light);
+
+let currentModel, mixer, actions = {}, currentAction = null;
+const clock = new THREE.Clock();
+const loader = new GLTFLoader();
+
+// 정서 → 클립 이름 매핑 (양방향 반응용)
+const emotionMap = {
+  idle: ['idle', 'Idle', 'breathing'],
+  happy: ['happy', 'celebrate', 'joy', 'proud'],
+  regret: ['regret', 'concern', 'sad_soft', 'worry'],
+  encourage: ['encourage', 'wave', 'cheer', 'support'],
+  celebrate: ['celebrate', 'jump', 'happy']
+};
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+}
+
+function playEmotion(emotion) {
+  if (!mixer) return setStatus('모델이 로드되지 않았습니다.');
+  const candidates = emotionMap[emotion] || [emotion];
+  let found = null;
+  for (const name of candidates) {
+    if (actions[name]) { found = actions[name]; break; }
+  }
+  if (!found) return setStatus(`'${emotion}' 클립을 찾을 수 없습니다. 사용 가능: ${Object.keys(actions).join(', ')}`);
+
+  if (currentAction) currentAction.fadeOut(0.4);
+  found.reset().fadeIn(0.4).play();
+  currentAction = found;
+
+  document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-emotion="${emotion}"]`)?.classList.add('active');
+  setStatus(`정서: ${emotion} 재생 중`);
+}
+
+function onLoaded(gltf) {
+  if (currentModel) {
+    scene.remove(currentModel);
+    currentModel.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+  }
+  currentModel = gltf.scene;
+  scene.add(currentModel);
+
+  const box = new THREE.Box3().setFromObject(currentModel);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  currentModel.position.sub(center);
+  currentModel.position.y += size.y / 2;
+  camera.position.set(0, Math.max(0.5, size.y * 0.7), Math.max(2, size.length() * 1.4));
+  controls.target.set(0, size.y * 0.5, 0);
+
+  mixer = gltf.animations.length ? new THREE.AnimationMixer(currentModel) : null;
+  actions = {};
+  if (mixer) {
+    gltf.animations.forEach(clip => {
+      actions[clip.name] = mixer.clipAction(clip);
+    });
+    playEmotion('idle');
+  }
+
+  // 정서 버튼 동적 생성
+  const container = document.getElementById('emotions');
+  container.innerHTML = '';
+  Object.keys(emotionMap).forEach(emo => {
+    const btn = document.createElement('button');
+    btn.className = 'emotion-btn';
+    btn.dataset.emotion = emo;
+    btn.textContent = emo;
+    btn.onclick = () => playEmotion(emo);
+    container.appendChild(btn);
+  });
+
+  setStatus(`로드 완료. 클립: ${Object.keys(actions).join(', ') || '없음'}`);
+}
+
+document.getElementById('load').onclick = () => {
+  const name = document.getElementById('character').value;
+  const path = `/assets/characters/${name}.glb`;
+  setStatus(path + ' 로드 중...');
+  loader.load(path, onLoaded, undefined, () => setStatus('파일을 찾을 수 없습니다. 직접 업로드하세요.'));
+};
+
+document.getElementById('file').onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  setStatus('파일 로드 중...');
+  loader.load(url, gltf => { onLoaded(gltf); URL.revokeObjectURL(url); }, undefined, err => {
+    setStatus('로드 실패: ' + err.message);
+    URL.revokeObjectURL(url);
+  });
+};
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  if (mixer) mixer.update(dt);
+  controls.update();
+  const w = document.querySelector('#scene').clientWidth;
+  const h = Math.max(300, Math.min(600, window.innerHeight * 0.6));
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
