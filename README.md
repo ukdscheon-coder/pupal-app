@@ -2,6 +2,13 @@
 
 A privacy-first family school-routine mobile web app.
 
+## Live Prototype
+GitHub Pages deployment is configured. Once Pages is enabled from the Actions workflow in repo Settings → Pages (Source: GitHub Actions), the live URL is:
+
+**https://ukdscheon-coder.github.io/pupal-app/**
+
+Open on iPhone/iPad Safari and Add to Home Screen for app-like experience.
+
 ## Current working scope
 - Parent and Kid modes on one device
 - Mission creation, child-declared completion, parent approval
@@ -10,7 +17,11 @@ A privacy-first family school-routine mobile web app.
 - Character gallery page (`/characters.html`) ready for approved images
 - 3D viewer for future GLB models
 
-## Deploy to Vercel (ready)
+## Deploy options
+### GitHub Pages (recommended for free immediate deploy)
+Workflow `.github/workflows/deploy-pages.yml` is ready. Enable in Settings → Pages → Source: GitHub Actions.
+
+### Vercel (alternative)
 1. Go to vercel.com → New Project
 2. Import `ukdscheon-coder/pupal-app`
 3. Framework Preset: Other
@@ -19,8 +30,6 @@ A privacy-first family school-routine mobile web app.
 6. Deploy
 
 The `vercel.json` is already configured for static hosting.
-
-After deploy, open the URL on iPhone/iPad Safari and Add to Home Screen.
 
 ## Character Assets
 To make approved characters appear:
@@ -39,4 +48,4 @@ To make approved characters appear:
 No real child names, school names, child photos, or exact locations are required. Data currently stays in browser LocalStorage. Do not use this prototype for sensitive personal information.
 
 ## Development workflow
-Push to main triggers GitHub Actions syntax checks. Production release requires separate mobile, privacy and animation quality checks.
+Push to main triggers GitHub Actions syntax checks and Pages deploy. Production release requires separate mobile, privacy and animation quality checks.
