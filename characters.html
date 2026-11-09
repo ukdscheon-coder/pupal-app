@@ -17,18 +17,17 @@ a{color:#4e4a86}
 <body>
 <div class="note">
 <h1>Approved PuPal Characters</h1>
-<p>Place exact approved character images (JPG/PNG) in <code>/assets/characters/</code> named character1.jpg, character2.jpg etc. They will appear here with floating animation. Full 3D GLB models go in the 3D viewer.</p>
+<p>35 exact approved character images are loaded from <code>/assets/characters/</code>. They appear with floating animation. Full 3D GLB models go in the 3D viewer.</p>
 <p><a href="/">Back to App</a> | <a href="/3d-viewer.html">3D Viewer</a></p>
 </div>
 <div class="gallery" id="gallery"></div>
 <script>
 const gallery=document.getElementById('gallery');
-// Example structure - replace with real image paths when assets are added
-const characters=['character1.jpg','character2.jpg','character3.jpg','character4.jpg','character5.jpg'];
+const characters=Array.from({length:35}, (_,i)=>`character${i+1}.jpg`);
 characters.forEach((src,i)=>{
   const card=document.createElement('div');
   card.className='card';
-  card.style.animationDelay=(i*0.2)+'s';
+  card.style.animationDelay=(i*0.1)+'s';
   card.innerHTML=`<img src="/assets/characters/${src}" alt="Approved character ${i+1}" onerror="this.style.display='none';this.parentElement.innerHTML='<p>Image not found<br><small>Add to /assets/characters/</small></p>'">
   <p>Character ${i+1}</p>`;
   gallery.appendChild(card);
