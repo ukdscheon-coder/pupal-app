@@ -3,33 +3,54 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PuPal Approved Characters</title>
+<title>PuPal Friends – Meet the Crew</title>
 <style>
-body{margin:0;background:#faf6f0;font-family:system-ui;color:#273149}
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;padding:20px;max-width:900px;margin:auto}
-.card{background:white;border-radius:20px;padding:12px;text-align:center;box-shadow:0 4px 20px #0001;animation:float 3s ease-in-out infinite}
-.card img{width:100%;height:180px;object-fit:contain;border-radius:12px;background:#f2f1fb}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.note{padding:20px;text-align:center;max-width:700px;margin:auto}
-a{color:#4e4a86}
+body{margin:0;background:linear-gradient(135deg,#fff8e7,#e8f4ff);font-family:'Nunito','Comic Sans MS',system-ui,sans-serif;color:#2d3748}
+.header{text-align:center;padding:30px 20px 10px;background:white;border-bottom:4px solid #ffd93d}
+.header h1{font-size:2.2rem;margin:0;color:#4e4a86}
+.header p{color:#667085;font-size:1.1rem}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;padding:24px;max-width:1100px;margin:auto}
+.card{background:white;border-radius:24px;padding:16px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.08);transition:transform .2s,box-shadow .2s;animation:float 4s ease-in-out infinite}
+.card:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 15px 40px rgba(0,0,0,.12)}
+.card img{width:100%;height:200px;object-fit:contain;border-radius:16px;background:#f7f3ff}
+.card h3{margin:12px 0 4px;font-size:1.2rem;color:#4e4a86}
+.card p{margin:0;font-size:.9rem;color:#667085}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.note{text-align:center;padding:20px;font-size:.95rem;color:#555}
+a{color:#6c63ff;font-weight:600;text-decoration:none}
 </style>
 </head>
 <body>
+<div class="header">
+  <h1>🌟 Meet the PuPal Friends</h1>
+  <p>These are the approved characters. Tap one to see more soon!</p>
+</div>
 <div class="note">
-<h1>Approved PuPal Characters</h1>
-<p>35 exact approved character images are loaded from <code>/assets/characters/</code>. They appear with floating animation. Full 3D GLB models go in the 3D viewer.</p>
-<p><a href="/">Back to App</a> | <a href="/3d-viewer.html">3D Viewer</a></p>
+  <a href="/">← Back to App</a> &nbsp;|&nbsp; <a href="/3d-viewer.html">3D Viewer →</a>
 </div>
 <div class="gallery" id="gallery"></div>
 <script>
-const gallery=document.getElementById('gallery');
-const characters=Array.from({length:35}, (_,i)=>`character${i+1}.jpg`);
-characters.forEach((src,i)=>{
-  const card=document.createElement('div');
-  card.className='card';
-  card.style.animationDelay=(i*0.1)+'s';
-  card.innerHTML=`<img src="/assets/characters/${src}" alt="Approved character ${i+1}" onerror="this.style.display='none';this.parentElement.innerHTML='<p>Image not found<br><small>Add to /assets/characters/</small></p>'">
-  <p>Character ${i+1}</p>`;
+const names = [
+  "Pip the Postman Hedgehog","Lila the Fox Girl","Cloud Teapot","Bookworm Buddy","Red Bus Buddy",
+  "Lightning Lou","Breakdance Bea","Soccer Star","Roller Rosie","Scooter Turtle",
+  "Skateboard Fox","Running Sneaker","Raincoat Ray","Bubble Belle","Crayon Charlie",
+  "Water Drop","Sunny Side","Moonlight Mia","Starry Steve","Cookie the Cat",
+  "Pine the Tree","Wave Rider","Flower Fiona","Cloud Hopper", /* 25 skipped */
+  "Hedgehog Helper","Teapot Tilly","Book Stack Sam","Fox Packer","Lightning Wake",
+  "Teapot Reader","Book Homework","Sneaker Sprint","Turtle Scoot","Fox Skate"
+];
+// Adjust length to match available files (skipping 25)
+const files = [];
+for(let i=1;i<=35;i++){ if(i===25) continue; files.push(`character${i}.jpg`); }
+const gallery = document.getElementById('gallery');
+files.forEach((src, idx) => {
+  const name = names[idx] || `Friend ${idx+1}`;
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.animationDelay = (idx * 0.15) + 's';
+  card.innerHTML = `<img src="/assets/characters/${src}" alt="${name}" onerror="this.style.display='none'">
+    <h3>${name}</h3>
+    <p>Approved Character</p>`;
   gallery.appendChild(card);
 });
 </script>
